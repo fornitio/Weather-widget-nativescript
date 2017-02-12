@@ -6,7 +6,6 @@ const tst = require('./toast');
 const note = require('./statusbarNotifications')();
 const geolocation = require('../services/geolocation');
 const getForecast = require('../services/getForecast')
-const applicationSettings = require("application-settings");
 const refreshViews = require('./refreshViews');
 
 const NOTE_ID = require('./constants').NOTE_ID;
@@ -56,11 +55,10 @@ function main(context, appWidgetManager, appWidgetIds, pI) {
             	def&&def.date ? def.date = null : null;
             	refreshViews(context, appWidgetManager, appWidgetIds, pI, def)
             } 
-            console.log(getForecast);
             getForecast({'latitude': loc.latitude, 'longitude': loc.longitude})
 	            .then((def)=>{
 	            	applicationSettings.setString('weather', JSON.stringify(def));
-	            	toast('settings saved.');
+	            	//toast('settings saved.');
 	                refreshViews(context, appWidgetManager, appWidgetIds, pI, def);
 	            })
 	            .catch((e)=>{
