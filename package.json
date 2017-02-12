@@ -1,7 +1,7 @@
 {
-  "description": "NativeScript Application",
-  "readme": "NativeScript Application",
-  "repository": "<fill-your-repository-here>",
+  "description": "weather widget",
+  "readme": "weather widget",
+  "repository": "https://github.com/fornitio/Weather-widget-nativescript.git",
   "nativescript": {
     "id": "org.nativescript.weatherwidgetnativescript",
     "tns-android": {
@@ -9,7 +9,7 @@
     }
   },
   "dependencies": {
-    "nativescript-geolocation": "0.0.15",
+    "nativescript-geolocation": "0.0.17",
     "nativescript-toast": "^1.4.3",
     "tns-core-modules": "2.2.1"
   },

@@ -19,6 +19,14 @@ function toast(...args) {
 
 function createViewModel() {
     const viewModel = new Observable();
+    const DEF_LOCATION = require('./utils/constants').DEF_LOCATION || {};
+
+    let settings = {};
+    applicationSettings.hasKey('settings') 
+        ? settings = JSON.parse(applicationSettings.getString('settings')) 
+        : settings = {};
+    
+
     let s = 'Application Log: \n';
     for (let i=1; i<21; i++) {
         if (applicationSettings.hasKey('log'+i)) {
@@ -26,7 +34,32 @@ function createViewModel() {
         } else {break}; 
     }
 
-    viewModel.set("tv", "Switch the network refreshing:"); 
+    viewModel.set("tv", "Switch the GPS refreshing:");
+    viewModel.set("lat", settings.lat || DEF_LOCATION.lat || 1); 
+    viewModel.set("lon", settings.lon || DEF_LOCATION.lon || 1); 
+   
+    viewModel.addEventListener(Observable.propertyChangeEvent, function (pcd) {
+        //console.log(pcd.eventName.toString() + " " + pcd.propertyName.toString() + " " + pcd.value.toString(), '--', typeof pcd.value);
+        const canBeSaved = pcd.eventName.toString() === 'propertyChange' 
+                            && ( (pcd.propertyName.toString() === 'lat') || (pcd.propertyName.toString() === 'lon') )
+                            && !isNaN(+pcd.value)
+                            && pcd.value != 0;
+        if (canBeSaved) {
+            if (pcd.propertyName.toString() === 'lat') {
+                (+pcd.value > 90) ? pcd.value = 90 : (+pcd.value < -90) ? pcd.value = -90 : null;  
+            }
+            if (pcd.propertyName.toString() === 'lon') {
+                (+pcd.value > 180) ? pcd.value = 180 : (+pcd.value < -180) ? pcd.value = -180 : null;  
+            }
+            settings[pcd.propertyName.toString()] = +pcd.value;
+            applicationSettings.setString('settings', JSON.stringify(settings));
+        } else {
+            viewModel.set("lat", settings.lat || DEF_LOCATION.lat || 1); 
+            viewModel.set("lon", settings.lon || DEF_LOCATION.lon || 1);
+        }
+        console.log(Observable.propertyChangeEvent, 'set:', JSON.stringify(settings));
+
+    });
 
     viewModel.set('message', s);    
     let messageOptions = {
@@ -40,14 +73,19 @@ function createViewModel() {
         sourceProperty: "sw",
         targetProperty: "checked"
     };
+
     mySwitch.bind(swOptions, viewModel);
+
     applicationSettings.hasKey('settings') ? viewModel.set("sw", settings.sw) : settings.sw = viewModel.sw;
     applicationSettings.setString('settings', JSON.stringify(settings));
+    viewModel.set("isEditable", !settings.sw);
 
 
     viewModel.onTapSw = function() {
         settings.sw = !viewModel.sw;
         applicationSettings.setString('settings', JSON.stringify(settings));
+        viewModel.set("isEditable", !settings.sw); 
+
         //toast(applicationSettings.getString('settings'));
     }
 

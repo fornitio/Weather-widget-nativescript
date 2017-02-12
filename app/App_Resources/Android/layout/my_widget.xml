@@ -16,11 +16,22 @@
         android:textColor="#ffffff"
         android:textSize="10sp"
         android:textStyle="bold" />
-    <ImageView
-        android:id="@+id/icon"
+    <LinearLayout 
+        android:id="@+id/linLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/o01d" />
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/o01d" />
+        <ImageView
+            android:id="@+id/spin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/spin" />
+    </LinearLayout>
     <TextView
         android:id="@+id/addons"
         android:layout_width="wrap_content"

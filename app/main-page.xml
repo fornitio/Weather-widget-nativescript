@@ -19,6 +19,10 @@ https://docs.nativescript.org/ui/components.
     <StackLayout class="p-20">
         <Label text="{{ tv }}"/>
         <Switch checked="{{ sw }}" tap="{{ onTapSw }}"/>
+        <Label text="Latitude:"/>
+        <TextView text="{{ lat }}" class="h2 text-center" hint="Type Latitude" editable = "{{ isEditable }}"/>
+        <Label text="Longitude:"/>
+        <TextView text="{{ lon }}" class="h2 text-center" hint="Type Longitude" editable = "{{ isEditable }}"/>
         <TextView text="{{ message }}" class="h2 text-center" textWrap="true"/>
     </StackLayout>
 </Page>
