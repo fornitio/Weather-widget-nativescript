@@ -16,6 +16,7 @@ function getForecast (location) {
                 return parsedBody;
             })
             .then(result => {
+                if (!result || !result.main || !isFinite(result.main.temp)) { throw Error(JSON.stringify(result)) }
                 let def = {};
                 def.city = result.name;
                 def.country = result.sys.country;

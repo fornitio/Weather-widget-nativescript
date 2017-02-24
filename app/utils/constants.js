@@ -3,6 +3,20 @@ module.exports = {
 		lat : 50, //Kharkiv Location
 		lon : 36.4
 	},
+	DEF_WEATHER : {
+			city : 'Not Connected',
+			country : '',
+			date : '0',
+			tHigh : '-273',
+			tLow : '-273',
+			weather : [{icon : '03d'}],
+			temp : '-273',
+		},
 	NOTE_ID : 1, //+new Date()
-	PENDING_MSG : 'Loading...'
+	PENDING_MSG : 'Loading...',
+	TEMP_CELSIUS_SIGN : '\u2103',
+	TEMP_HIGH_SIGN : '\u2191',
+	TEMP_LOW_SIGN : '\u2193',
+	TEMP_GAP_SIGN : ' ',
+	LOG_LENGTH : 30
 }

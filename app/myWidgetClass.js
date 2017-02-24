@@ -10,7 +10,7 @@ let settings = null;
             // const toast = utilites.toast;
             // const main = utilites.main;
             // const refreshViews = utilites.refreshViews;
-            toast('Processing...', context);
+            toast('Processing...');
             const intent = new android.content.Intent(context, com.tns.MyWidget.class);
             intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
