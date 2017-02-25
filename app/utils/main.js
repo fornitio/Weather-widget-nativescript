@@ -12,6 +12,7 @@ const LOG_LENGTH = require('./constants').LOG_LENGTH;
 const NOTE_ID = require('./constants').NOTE_ID;
 const DEF_LOCATION = require('./constants').DEF_LOCATION;
 const DEF_WEATHER = require('./constants').DEF_WEATHER;
+const tC = require('./constants').TEMP_CELSIUS_SIGN;
 const R = org.nativescript.weatherwidgetnativescript.R; 
 
 const toast = (...args)=>{
@@ -30,6 +31,7 @@ const toast = (...args)=>{
 };
 
 function main(context, appWidgetManager, appWidgetIds, pI) {
+	//initialization
 	let settings = {};
 	applicationSettings.hasKey('settings') 
 		? settings = JSON.parse(applicationSettings.getString('settings')) 
@@ -49,6 +51,8 @@ function main(context, appWidgetManager, appWidgetIds, pI) {
 		: (Promise.resolve({'latitude' : settings.lat || DEF_LOCATION.lat, 
 							'longitude' : settings.lon || DEF_LOCATION.lon
 						}));
+    
+    //obtain information
     location
         .catch((e)=>{
         	toast(e);
@@ -68,7 +72,7 @@ function main(context, appWidgetManager, appWidgetIds, pI) {
             getForecast({'latitude': loc.latitude, 'longitude': loc.longitude})
 	            .then((def)=>{
 	            	applicationSettings.setString('weather', JSON.stringify(def));
-	            	toast( def?def.temp:('Response:'+JSON.stringify(def)) );
+	            	toast( def ? (def.temp + tC) : ('Server response: '+JSON.stringify(def)) );
 	                refreshViews(context, appWidgetManager, appWidgetIds, pI, def);
 	            })
 	            .catch((e)=>{
