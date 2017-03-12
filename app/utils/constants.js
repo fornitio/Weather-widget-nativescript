@@ -1,4 +1,5 @@
 module.exports = {
+    DEF_ICON : org.nativescript.weatherwidgetnativescript.R.drawable['o01d'],
 	DEF_LOCATION : {
 		lat : 50, //Kharkiv Location
 		lon : 36.4

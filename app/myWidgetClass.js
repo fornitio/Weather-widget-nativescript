@@ -1,28 +1,39 @@
 const applicationSettings = require("application-settings");
-const main = require('./utils/main');
+const main = require('./utils/main')();
+const constants = require('./utils/constants');
 const toast = require('./utils/toast');
-// const refreshViews = require('./utils/refreshViews');
-let settings = null;
+const note = require('./utils/statusbarNotifications')();
+const log = require('./utils/log')(console.log.bind(console));
+const refreshViews = require('./utils/refreshViews')();
+//wrapper of refreshViews
+const refresher = (context, appWidgetManager, appWidgetIds, pI, isVibration) => 
+    def => refreshViews(context, appWidgetManager, appWidgetIds, pI, isVibration, def)
+const geolocation = require('./services/geolocation');
+const getForecast = require('./services/getForecast');
+
 
 (function myWidgetClass() {
     android.appwidget.AppWidgetProvider.extend("com.tns.MyWidget", {
         onUpdate: function (context, appWidgetManager, appWidgetIds) {
-            // const toast = utilites.toast;
-            // const main = utilites.main;
-            // const refreshViews = utilites.refreshViews;
-            toast('Processing...');
+
+            //initialization
+            const settings = applicationSettings.hasKey('settings') 
+                ? JSON.parse(applicationSettings.getString('settings')) 
+                : {};
+            if ( typeof settings !== 'object' ) { settings = {} };
+            const defLocationPromise = Promise.resolve({
+                'latitude' : settings.lat || constants.DEF_LOCATION.lat, 
+                'longitude' : settings.lon || constants.DEF_LOCATION.lon });
+            const location = settings.sw ? geolocation() : defLocationPromise;
+            const toaster = settings.isToast ? (...args)=>{toast(args);log(args)} : log;
+
+            toast('Getting forecast');
             const intent = new android.content.Intent(context, com.tns.MyWidget.class);
             intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
 		  	const pI = android.app.PendingIntent.getBroadcast(context, 0, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT);
-            main(context, appWidgetManager, appWidgetIds, pI) 
-    		
-            /*applicationSettings.hasKey('settings') ? settings = JSON.parse(applicationSettings.getString('settings')) : settings = null;
-            settings&&settings.sw 
-            	? main(context, appWidgetManager, appWidgetIds, pI) 
-            	: toast('Network refreshing off.') || applicationSettings.hasKey('weather') 
-        			? refreshViews(context, appWidgetManager, appWidgetIds, pI, JSON.parse(applicationSettings.getString('weather')))
-        			: refreshViews(context, appWidgetManager, appWidgetIds, pI, null)*/
+            const rV = refresher(context, appWidgetManager, appWidgetIds, pI, settings.isVibration);
+            main(rV, location, getForecast, note, applicationSettings, toaster);
         }
     });
 })();

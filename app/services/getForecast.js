@@ -1,4 +1,4 @@
-function getForecast (location) {
+function getForecast (location, fetch) {
     const config = {
         method : 'GET',
         mode : 'cors'
@@ -13,14 +13,16 @@ function getForecast (location) {
         fetch(encodeURI(uri), config)
             .then(result => {
                 var parsedBody = JSON.parse(result._bodyInit); 
+                console.log('***', JSON.stringify(parsedBody) );
                 return parsedBody;
             })
             .then(result => {
-                if (!result || !result.main || !isFinite(result.main.temp)) { throw Error(JSON.stringify(result)) }
+                if (!result || !result.main || !isFinite(result.main.temp)) { rej(JSON.stringify(result)) }
                 let def = {};
                 def.city = result.name;
                 def.country = result.sys.country;
-                def.date = +new Date();
+                def.date = result.dt+'000';
+                console.log('date', Date.now() - def.date);
                 def.tHigh = Math.round(result.main.temp_max);
                 def.tLow = Math.round(result.main.temp_min);
                 def.weather = result.weather;
@@ -28,7 +30,7 @@ function getForecast (location) {
                 def.coord = result.coord;
                 res(def);
             })
-            .catch(err => { rej(err) });        
+            .catch(e => {rej(e)});       
     });
     return weather;
 }

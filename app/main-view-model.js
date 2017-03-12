@@ -14,25 +14,85 @@ const LOG_LENGTH = require('./utils/constants').LOG_LENGTH;
 function createViewModel() {
     const viewModel = new Observable();
 
-    let settings = {};
-    applicationSettings.hasKey('settings') 
-        ? settings = JSON.parse(applicationSettings.getString('settings')) 
-        : settings = {};
-    
+    //settings initialization
+    let settings = applicationSettings.hasKey('settings') 
+        ? JSON.parse(applicationSettings.getString('settings')) 
+        : {};
+    if ( typeof settings !== 'object' ) { settings = {} };
 
+    viewModel.set("tv", "Refreshing from GPS "+(settings.sw ? "on" : "off")+":");
+    viewModel.set("lat", settings.lat || DEF_LOCATION.lat); 
+    viewModel.set("lon", settings.lon || DEF_LOCATION.lon); 
+
+    //Log-making
     let logString = 'Application Log: \n';
     for (let i=1; i<LOG_LENGTH+1; i++) {
         if (applicationSettings.hasKey('log'+i)) {
             logString += applicationSettings.getString('log'+i)
         } else {break}; 
     }
+    viewModel.set('message', logString);    
+    const messageOptions = {
+        sourceProperty: "refreshTime",
+        targetProperty: "text"
+    }
+    textField.bind(messageOptions, viewModel);
+    
+    //Refreshing from GPS switch
+    viewModel.set("sw", true);
+    const swOptions = {
+        sourceProperty: "sw",
+        targetProperty: "checked"
+    };
+    mySwitch.bind(swOptions, viewModel);
 
-    viewModel.set("tv", "Switch the GPS refreshing:");
-    viewModel.set("lat", settings.lat || DEF_LOCATION.lat); 
-    viewModel.set("lon", settings.lon || DEF_LOCATION.lon); 
-   
-    viewModel.addEventListener(Observable.propertyChangeEvent, function (pcd) {
-        //console.log(pcd.eventName.toString() + " " + pcd.propertyName.toString() + " " + pcd.value.toString(), '--', typeof pcd.value);
+    applicationSettings.hasKey('settings') ? viewModel.set("sw", settings.sw) : settings.sw = viewModel.sw;
+    applicationSettings.setString('settings', JSON.stringify(settings));
+    
+    viewModel.set("isEditable", !settings.sw);
+    viewModel.onTapSw = function() {
+        settings.sw = !viewModel.sw;
+        applicationSettings.setString('settings', JSON.stringify(settings));
+        viewModel.set("isEditable", !settings.sw); 
+        viewModel.set("tv", "Refreshing from GPS "+(settings.sw ? "on" : "off")+":");
+    }
+
+    //Toast messages Switch
+    viewModel.set("isToast", true);
+    const toastOptions = {
+        sourceProperty: "isToast",
+        targetProperty: "checked"
+    };
+    mySwitch.bind(toastOptions, viewModel);
+
+    applicationSettings.hasKey('settings') ? viewModel.set("isToast", settings.isToast) : settings.isToast = viewModel.isToast;
+    applicationSettings.setString('settings', JSON.stringify(settings));
+
+    viewModel.onTapToast = function() {
+        settings.isToast = !viewModel.isToast;
+        applicationSettings.setString('settings', JSON.stringify(settings)); 
+    }
+
+    //Vibration notifications Switch
+    viewModel.set("isVibration", true);
+    const vibrationOptions = {
+        sourceProperty: "isVibration",
+        targetProperty: "checked"
+    };
+    mySwitch.bind(vibrationOptions, viewModel);
+
+    applicationSettings.hasKey('settings') 
+        ? viewModel.set("isVibration", settings.isVibration) 
+        : settings.isVibration = viewModel.isVibration;
+    applicationSettings.setString('settings', JSON.stringify(settings));
+
+    viewModel.onTapVibration = function() {
+        settings.isVibration = !viewModel.isVibration;
+        applicationSettings.setString('settings', JSON.stringify(settings)); 
+    }
+
+    //Coordinates on-the-fly changes listener
+    viewModel.addEventListener(Observable.propertyChangeEvent, function CoordinatesCorrectionOnTheFly(pcd) {
         const canBeSaved = pcd.eventName.toString() === 'propertyChange' 
                             && ( (pcd.propertyName.toString() === 'lat') || (pcd.propertyName.toString() === 'lon') )
                             && isFinite(+pcd.value);
@@ -52,34 +112,6 @@ function createViewModel() {
         console.log(Observable.propertyChangeEvent, 'set:', JSON.stringify(settings));
 
     });
-
-    viewModel.set('message', logString);    
-    let messageOptions = {
-        sourceProperty: "refreshTime",
-        targetProperty: "text"
-    }
-    textField.bind(messageOptions, viewModel);
-    
-    viewModel.set("sw", true);
-    const swOptions = {
-        sourceProperty: "sw",
-        targetProperty: "checked"
-    };
-
-    mySwitch.bind(swOptions, viewModel);
-
-    applicationSettings.hasKey('settings') ? viewModel.set("sw", settings.sw) : settings.sw = viewModel.sw;
-    applicationSettings.setString('settings', JSON.stringify(settings));
-    viewModel.set("isEditable", !settings.sw);
-
-
-    viewModel.onTapSw = function() {
-        settings.sw = !viewModel.sw;
-        applicationSettings.setString('settings', JSON.stringify(settings));
-        viewModel.set("isEditable", !settings.sw); 
-
-        //toast(applicationSettings.getString('settings'));
-    }
 
     return viewModel;
 }

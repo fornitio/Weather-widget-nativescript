@@ -17,12 +17,22 @@ https://docs.nativescript.org/ui/components.
     class names available for styling your app at https://docs.nativescript.org/ui/theme.
     -->
     <StackLayout class="p-20">
-        <Label text="{{ tv }}"/>
-        <Switch checked="{{ sw }}" tap="{{ onTapSw }}"/>
-        <Label text="Latitude:"/>
-        <TextView text="{{ lat }}" class="h2 text-center" hint="Type Latitude" editable = "{{ isEditable }}"/>
+        <DockLayout>
+            <Label text="Toast messages: "/>
+            <Switch dock="right" checked="{{ isToast }}" tap="{{ onTapToast }}"/>
+        </DockLayout>
+        <DockLayout>
+            <Label text="Vibration when notification received: "/>
+            <Switch dock="right" checked="{{ isVibration }}" tap="{{ onTapVibration }}"/>
+        </DockLayout>
+        <DockLayout>
+            <Label text="{{ tv }}"/>
+            <Switch dock="right" checked="{{ sw }}" tap="{{ onTapSw }}"/>
+        </DockLayout>
+        <Label text="Latitude :"/>
+        <TextView dock="right" text="{{ lat }}" class="h2 text-center" hint="Type Latitude" editable = "{{ isEditable }}"/>
         <Label text="Longitude:"/>
-        <TextView text="{{ lon }}" class="h2 text-center" hint="Type Longitude" editable = "{{ isEditable }}"/>
+        <TextView dock="right" text="{{ lon }}" class="h2 text-center" hint="Type Longitude" editable = "{{ isEditable }}"/>
         <TextView text="{{ message }}" class="h2 text-center" textWrap="true"/>
     </StackLayout>
 </Page>

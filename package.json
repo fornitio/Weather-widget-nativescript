@@ -11,12 +11,17 @@
   "dependencies": {
     "nativescript-geolocation": "0.0.17",
     "nativescript-toast": "^1.4.3",
+    "nativescript-unit-test-runner": "^0.3.4",
     "tns-core-modules": "2.2.1"
   },
   "devDependencies": {
     "babel-traverse": "6.13.0",
     "babel-types": "6.13.0",
     "babylon": "6.9.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.5.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-nativescript-launcher": "^0.4.0",
     "lazy": "1.0.11"
   }
 }

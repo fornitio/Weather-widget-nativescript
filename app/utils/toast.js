@@ -1,7 +1,7 @@
-function toast(...args) {
+const toast = (...args) => {
     const Toast = require("nativescript-toast");
     const msg = args.join(' ');
-    let tst = Toast.makeText(msg);
-    tst.show();
+    const text = Toast.makeText(msg);
+    text.show();
 }
 module.exports = toast;

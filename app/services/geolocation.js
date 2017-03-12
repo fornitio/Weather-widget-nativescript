@@ -8,22 +8,26 @@ function geoLocation() {
     			        timeout: 20000 
     				};
     const geo = new Promise (( res, rej )=>{
-    	if (sdk >= 23) {rej(new Error('Version of SDK didn\'t match. Geolocation disabled. Please fill the coordinates manually.')); return}
+    	if (sdk >= 23) {
+    		rej(new Error('Version of SDK didn\'t match. Geolocation disabled. Please fill the coordinates manually.')); 
+    		return
+    	}
 		if (!geolocation.isEnabled()) {
 		    geolocation.enableLocationRequest()
 		    	.then(()=>{
 					geolocation.getCurrentLocation(options)
-							.then((coordinates)=>{
-								res(coordinates)
-							})
-		    		
+						.then((coordinates)=>{
+							res(coordinates)
+						});		    		
 		    	})
 		    	.catch((e)=>{ rej(e) });
-		} else 	geolocation.getCurrentLocation(options)
-							.then((coordinates)=>{
-								res(coordinates)
-							})
-							.catch((e)=>{ rej(e) });
+		} else 	{
+			geolocation.getCurrentLocation(options)
+				.then((coordinates)=>{
+					res(coordinates)
+				})
+				.catch((e)=>{ rej(e) });
+		}
 	});
     return geo;
 }
