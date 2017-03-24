@@ -13,7 +13,6 @@ function getForecast (location, fetch) {
         fetch(encodeURI(uri), config)
             .then(result => {
                 var parsedBody = JSON.parse(result._bodyInit); 
-                console.log('***', JSON.stringify(parsedBody) );
                 return parsedBody;
             })
             .then(result => {

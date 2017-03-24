@@ -28,7 +28,7 @@ describe("A suite", function() {
   });
 });
 
-describe("getForecast", function() {
+describe("GET FORECAST TESTS", function() {
 	const getForecast = require('../services/getForecast');
 
   	it("getForecast must return a Promise", function() {
@@ -44,7 +44,7 @@ describe("getForecast", function() {
   	});
 
   	it("getForecast must return an error", function(done) {
-  			getForecast(c.DEF_LOCATION, function() {return Promise.reject(Error('Fetch error'))})
+  			getForecast(c.DEF_LOCATION, function() {return Promise.reject( Error( 'Fetch error' ) )})
 	  			.catch( (e)=>{
 			  		expect( e.message ).toEqual('Fetch error');
 			  	  	done();
@@ -53,55 +53,113 @@ describe("getForecast", function() {
 });
 
 describe("MAIN MODULE TEST", function() {
-	// main(refreshViews, location, getForecast, note, applicationSettings)
+	// main(refreshViews, location, getForecast, note, applicationSettings, toast)
 	const main = require('../utils/main')();
+	let predefinedObj = {temp:100};
 	let appSettings = {};
-	const predefinedObj = {temp:100};
-	beforeEach(()=>{
+	let result;
+	
+	beforeEach(() => {
 		appSettings.hasKey = a=>!!appSettings[a];
 		appSettings.getString = a=>appSettings[a];
 		appSettings.setString = (a,b)=>{appSettings[a]=b};
 	});
 	afterEach(()=>{
 		appSettings = {};
+		result = undefined;
+		predefinedObj = {temp:100};
 	});
 
-	it("contains spec with an expectation", function() {
-    	expect(true).toBe(true);
+	it("result's value must be undefined", function() {
+    	expect(result).toBe(undefined);
 	});
 
-	it("refreshViews test", function() {
-		let x;
-		const rV = def => {x = def};
+/*	it("refreshViews must get default value", function() {
+		const rV = def => {result = def};
 		appSettings.hasKey = ()=>false;
 		main(rV, Promise.reject(), Promise.reject(), a=>a, appSettings, b=>b);
-    	expect(JSON.stringify(x)).toEqual(JSON.stringify(c.DEF_WEATHER));
+    	expect(JSON.stringify(result)).toEqual(JSON.stringify(c.DEF_WEATHER));
 	});
 	
-	it("application-settings test", function() {
-		let x;
-		const rV = def => {x = def};
+	it("refreshViews must get predefined value", function(done) {
+		const refreshViews = def => {
+    		expect(JSON.stringify(def)).toEqual(JSON.stringify(true));
+    		done();
+		};
+		const getForecast = Promise.reject();
 		appSettings.setString('weather', JSON.stringify(predefinedObj));
-		main(rV, Promise.reject(), Promise.reject(), a=>a, appSettings, b=>b);
-    	expect(JSON.stringify(x)).toEqual(JSON.stringify(predefinedObj));
+		main(refreshViews, Promise.reject(), getForecast, a=>a, appSettings, b=>b);
 	});
 
-	it("statusbar notification test", function(done) {
-		let x;
+	it("[getForecast catch] statusbar notification must get 'no connection' array", function(done) {
+		const e = 'getForecast error';
+		const message = [c.NOTE_ID+2, 'No connection', e, c.DEF_ICON, true];
 		const note = (...args) => {
-			x = args;
-			expect(JSON.stringify(x)).toEqual(JSON.stringify([c.NOTE_ID+2, 'No connection', predefinedObj, c.DEF_ICON, true]));
+			expect(JSON.stringify(args)).toEqual(JSON.stringify(message));
 			done()
 		};
 		const loc = Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
                                     'longitude' : c.DEF_LOCATION.lon
                                 });
-		const forecast = Promise.reject(predefinedObj);
-		
+		const forecast = Promise.reject(e);
 		appSettings.hasKey = ()=>false;
 		main(a=>{}, loc, ()=>forecast, note, appSettings, b=>b);
-			
 	});
+
+	it("[getForecast catch] refreshViews must get default weather const", function(done) {
+		const refreshViews = (...args) => {
+			expect(JSON.stringify(args[0])).toEqual(JSON.stringify(c.DEF_WEATHER));
+			done()
+		};
+		const loc = Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		const forecast = Promise.reject();
+		appSettings.hasKey = ()=>false;
+		main(refreshViews, loc, ()=>forecast, a=>a, appSettings, b=>b);
+	});
+	
+	it("[getLocation then] toast must get coordinates string", function(done) {
+		const coordinatesString = '(50.0, 36.4)';
+		const toast = (...args) => {
+			expect(args[0]).toEqual(coordinatesString);
+			done()
+		};
+		const loc = Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		const forecast = Promise.resolve();
+		appSettings.hasKey = ()=>false;
+		main(b=>b, loc, ()=>forecast, a=>a, appSettings, toast);
+	});*/
+		
+	it("[getForecast then] refreshViews must get predefined object", function(done) {
+		const refreshViews = (...args) => {
+			expect(JSON.stringify(args[0])).toEqual(JSON.stringify(predefinedObj));
+			done()
+		};
+		const loc = Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		const forecast = () => Promise.resolve(predefinedObj);
+		appSettings.hasKey = ()=>false;
+		main(refreshViews, loc, forecast, a=>a, appSettings, b=>b);
+	});
+
+	it("[getForecast catch] refreshViews must get predefined object", function(done) {
+		const refreshViews = (...args) => {
+			expect(JSON.stringify(args[0])).toEqual(JSON.stringify(predefinedObj));
+			done()
+		};
+		const loc = Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		const forecast = () => Promise.reject(predefinedObj);
+		//appSettings.hasKey = ()=>false;
+		appSettings.setString('weather', JSON.stringify(predefinedObj));
+		main(refreshViews, loc, forecast, a=>a, appSettings, b=>b);
+	});
+
 });
 
 
