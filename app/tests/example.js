@@ -54,20 +54,30 @@ describe("GET FORECAST TESTS", function() {
 
 describe("MAIN MODULE TEST", function() {
 	// main(refreshViews, location, getForecast, note, applicationSettings, toast)
-	const main = require('../utils/main')();
+	const m = require('../utils/main');
 	let predefinedObj = {temp:100};
 	let appSettings = {};
 	let result;
-	
+	let mockPermissions = {};	
+	let log;
+	let loc = {};
+	let forecast;
+	let main;
+
 	beforeEach(() => {
+		main = m();
 		appSettings.hasKey = a=>!!appSettings[a];
 		appSettings.getString = a=>appSettings[a];
 		appSettings.setString = (a,b)=>{appSettings[a]=b};
 	});
 	afterEach(()=>{
+		forecast = undefined;
+		loc = {};
+		log = undefined;
 		appSettings = {};
 		result = undefined;
 		predefinedObj = {temp:100};
+		mockPermissions = {};
 	});
 
 	it("result's value must be undefined", function() {
@@ -132,8 +142,8 @@ describe("MAIN MODULE TEST", function() {
 		appSettings.hasKey = ()=>false;
 		main(b=>b, loc, ()=>forecast, a=>a, appSettings, toast);
 	});*/
-		
-	it("[getForecast then] refreshViews must get predefined object", function(done) {
+	
+	/*it("[getForecast then] refreshViews must get predefined object", function(done) {
 		const refreshViews = (...args) => {
 			expect(JSON.stringify(args[0])).toEqual(JSON.stringify(predefinedObj));
 			done()
@@ -159,6 +169,123 @@ describe("MAIN MODULE TEST", function() {
 		appSettings.setString('weather', JSON.stringify(predefinedObj));
 		main(refreshViews, loc, forecast, a=>a, appSettings, b=>b);
 	});
+	*/
+	
+	//main (refreshViews, geolocation, getForecast, note, applicationSettings, toast, log, constants, permissions) => {
+
+/*	it("Must return permissions granted string (already has permissions)", function(done) {
+		log = (...args) => {
+			expect(args[0]).toEqual('Permissions Granted.'+'1');
+			done()
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		forecast = () => Promise.resolve(predefinedObj);
+		//appSettings.hasKey = ()=>false;
+		mockPermissions.hasPermission = () => true;
+		mockPermissions.requestPermission = Promise.resolve(true);
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, log, c, mockPermissions);
+	});
+
+	it("Must return permissions granted string (permissions granteg by request)", function(done) {
+		log = (...args) => {
+			expect(args[0]).toEqual('Permissions Granted.'+'2');
+			done()
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		forecast = () => Promise.resolve(predefinedObj);
+		//appSettings.hasKey = ()=>false;
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.resolve(true);
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, log, c, mockPermissions);
+	});
+
+	it("Must return no permissions string (permissions rejected by request)", function(done) {
+		log = (...args) => {
+			expect(args[0]).toEqual('No Permissions.');
+			done()
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : c.DEF_LOCATION.lat, 
+                                    'longitude' : c.DEF_LOCATION.lon
+                                });
+		forecast = () => Promise.resolve(predefinedObj);
+		//appSettings.hasKey = ()=>false;
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.reject(false);
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, log, c, mockPermissions);
+	});*/
+
+	it("Must return geolocation object (permissions have been already granteg)", function(done) {
+		forecast = (...args) => {
+			expect(JSON.stringify(args[0])).toEqual(JSON.stringify({'latitude': 1000, 'longitude': 2000}));
+			done();
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : 1000, 'longitude' : 2000});
+		mockPermissions.hasPermission = () => true;
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, l=>l, c, mockPermissions);
+	});
+
+	it("Must return geolocation object (permissions granteg by request)", function(done) {
+		forecast = (...args) => {
+			expect(JSON.stringify(args[0])).toEqual(JSON.stringify({'latitude': 1000, 'longitude': 2000}));
+			done();
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : 1000, 'longitude' : 2000});
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.resolve(true);
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, l=>l, c, mockPermissions);
+	});
+
+	it("Must return default geoloction object (permissions rejected by request)", function(done) {
+		forecast = (...args) => {
+			expect(JSON.stringify(args[0]))
+				.toEqual(JSON.stringify({'latitude': c.DEF_LOCATION.lat, 'longitude': c.DEF_LOCATION.lon}));
+			done();
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : 1000, 'longitude' : 2000});
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.reject(true);
+		appSettings.setString('settings', JSON.stringify({sw: true}));
+		main(r=>r, loc, forecast, n=>n, appSettings, t=>t, l=>l, c, mockPermissions);
+	});
+
+	it("Must return arry for refreshViews (permissions rejected by request) getForecast resolved", function(done) {
+		rV = (...args) => {
+			expect(JSON.stringify(args))
+				.toEqual(JSON.stringify([true, predefinedObj]));
+			done();
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : 1000, 'longitude' : 2000});
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.reject(true);
+		appSettings.setString('settings', JSON.stringify({sw: true, isVibration: true}));
+		forecast = () => Promise.resolve(predefinedObj);
+		main(rV, loc, forecast, n=>n, appSettings, t=>t, l=>l, c, mockPermissions);
+	});
+
+	it("Must return  (permissions rejected by request)", function(done) {
+		rV = (...args) => {
+			expect(JSON.stringify(args))
+				.toEqual(JSON.stringify([true, predefinedObj]));
+			done();
+		};
+		loc.getCurrent = () => Promise.resolve({'latitude' : 1000, 'longitude' : 2000});
+		mockPermissions.hasPermission = () => false;
+		mockPermissions.requestPermission = () => Promise.reject(true);
+		appSettings.setString('settings', JSON.stringify({sw: true, isVibration: true}));
+		appSettings.setString('weather', JSON.stringify(predefinedObj));
+		forecast = () => Promise.reject('no forecast.');
+		main(rV, loc, forecast, n=>n, appSettings, t=>t, l=>l, c, mockPermissions);
+	});
+
 
 });
 

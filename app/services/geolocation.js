@@ -76,6 +76,7 @@ const geolocation = () => {
 	        debug('onLocationChanged', location.toString());
 	        var value = this.serialize(location);
 	        this.resolve(value);
+	        this.disconnect();
 	      }.bind(this),
 	    });
 	}.bind(service);
@@ -94,22 +95,24 @@ const geolocation = () => {
 	}.bind(service);
 
 	service.getCurrent = function getCurrent() {
-	  return new Promise(function(resolve, reject) {
-	    var _getCurrent = function _getCurrent() {
-		    this.resolve = resolve.bind(this);
-			LocationServices.FusedLocationApi.requestLocationUpdates(this.googleApiClient, this.locationRequest, this.locationListener);
-	        this.off('_googleApiClientConnected');
-		    setTimeout(()=>{
-	    		reject('geoLocation timeout error');
-	    	},params.locationMaxWaitTime*10);
-	    }.bind(this);
-	    if (this.ready) {
-	      _getCurrent();
-	    } else {
-	      this.on('_googleApiClientConnected', _getCurrent);
-	    }
-	  }.bind(service));
-	};	
+		this.connect();
+	  	return new Promise(function(resolve, reject) {
+	    	var _getCurrent = function _getCurrent() {
+		    	this.resolve = resolve.bind(this);
+				LocationServices.FusedLocationApi.requestLocationUpdates(this.googleApiClient, this.locationRequest, this.locationListener);
+	        	this.off('_googleApiClientConnected');
+		    	setTimeout(()=>{
+	    			reject('geoLocation timeout error');
+	    			this.disconnect();
+	    		},params.locationMaxWaitTime*10);
+	    	}.bind(this);
+	    	if (this.ready) {
+	      		_getCurrent();
+	    	} else {
+	      		this.on('_googleApiClientConnected', _getCurrent);
+	    	}
+	  	}.bind(this));
+	}.bind(service);	
 	return service;	
 }
 module.exports = geolocation;
