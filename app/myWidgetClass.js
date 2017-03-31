@@ -1,10 +1,3 @@
-/*    
-const constants = require('./constants');
-    const NOTE_ID = constants.NOTE_ID;
-    const DEF_LOCATION = constants.DEF_LOCATION;
-    const DEF_WEATHER = constants.DEF_WEATHER;
-    const tC = constants.TEMP_CELSIUS_SIGN;
-    const DEF_ICON = constants.DEF_ICON;*/
 const applicationSettings = require("application-settings");
 const main = require('./utils/main')();
 const constants = require('./utils/constants');
@@ -17,12 +10,12 @@ const refreshViews = require('./utils/refreshViews')();
 const refreshViewsWrapper = (context, appWidgetManager, appWidgetIds, pI) => 
     (isVibration, def) => refreshViews(context, appWidgetManager, appWidgetIds, pI, isVibration, def)
 const geolocation = require('./services/geolocation')();
-const getForecast = require('./services/getForecast');
+const getForecast = require('./services/getForecast')( fetch, constants.URI, {method : 'GET', mode : 'cors'} );
 
 (function myWidgetClass() {
     android.appwidget.AppWidgetProvider.extend("com.tns.MyWidget", {
         onUpdate: function (context, appWidgetManager, appWidgetIds) {
-            toast('Obtaining...');
+            //toast('Obtaining...');
             const intent = new android.content.Intent(context, com.tns.MyWidget.class);
             intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);

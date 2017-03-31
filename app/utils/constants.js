@@ -4,6 +4,10 @@ module.exports = {
 		lat : 50, //Kharkiv Location
 		lon : 36.4
 	},
+	URI : (location => "http://api.openweathermap.org/data/2.5/weather"
+		+"?lat="+location.latitude
+    	+"&lon="+location.longitude
+    	+"&units=metric&lang=ua&APPID=22391be6042fa0d7b69ddd3e39549e72"),
 	DEF_WEATHER : {
 			city : 'Not Connected',
 			country : '',
@@ -11,7 +15,7 @@ module.exports = {
 			tHigh : '--',
 			tLow : '--',
 			weather : [{icon : '03d'}],
-			temp : '-273',
+			temp : '273',
 		},
 	NOTE_ID : 1, //+new Date()
 	PENDING_MSG : 'Loading...',

@@ -29,7 +29,7 @@ const refreshViews = () => {
                     + tHigh + addPlus(def&&def.tHigh) + tC + gap
                     + tLow + addPlus(def&&def.tLow) + tC;
         const cityStr = (def&&def.city ? def.city : PENDING_MSG) + (def&&def.country ? (', ' + def.country) : '');
-        const dateStr = makeDate(def&&def.date ? def.date : null);
+        const dateStr = makeDate(def&&def.date ? def.date : undefined);
         const tempStr = def && isFinite(def.temp) ? addon : PENDING_MSG;
         const ico = def && def.weather && def.weather[0] && def.weather[0].icon ? R.drawable['o'+def.weather[0].icon] : DEF_ICON;
         

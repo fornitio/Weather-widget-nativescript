@@ -98,10 +98,10 @@ function createViewModel() {
                             && isFinite(+pcd.value);
         if (canBeSaved) {
             if (pcd.propertyName.toString() === 'lat') {
-                (+pcd.value > 90) ? pcd.value = 90 : (+pcd.value < -90) ? pcd.value = -90 : null;  
+                (+pcd.value > 90) ? pcd.value = 90 : (+pcd.value < -90) ? pcd.value = -90 : undefined;  
             }
             if (pcd.propertyName.toString() === 'lon') {
-                (+pcd.value > 180) ? pcd.value = 180 : (+pcd.value < -180) ? pcd.value = -180 : null;  
+                (+pcd.value > 180) ? pcd.value = 180 : (+pcd.value < -180) ? pcd.value = -180 : undefined;  
             }
             settings[pcd.propertyName.toString()] = +pcd.value;
             applicationSettings.setString('settings', JSON.stringify(settings));

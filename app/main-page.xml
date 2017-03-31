@@ -33,6 +33,6 @@ https://docs.nativescript.org/ui/components.
         <TextView dock="right" text="{{ lat }}" class="h2 text-center" hint="Type Latitude" editable = "{{ isEditable }}"/>
         <Label text="Longitude:"/>
         <TextView dock="right" text="{{ lon }}" class="h2 text-center" hint="Type Longitude" editable = "{{ isEditable }}"/>
-        <TextView text="{{ message }}" class="h2 text-center" textWrap="true"/>
+        <TextView text="{{ message }}" class="h2 text-center" textWrap="true" editable ="false"/>
     </StackLayout>
 </Page>

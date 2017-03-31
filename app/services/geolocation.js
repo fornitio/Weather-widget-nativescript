@@ -18,18 +18,17 @@ const geolocation = () => {
 	  return location ? {
 	    provider: location.getProvider(),
 	    timestamp: new Date(location.getTime()),
-	    accuracy: location.hasAccuracy() ? location.getAccuracy() : null,
+	    accuracy: location.hasAccuracy() ? location.getAccuracy() : undefined,
 	    latitude: location.getLatitude(),
 	    longitude: location.getLongitude(),
-	    altitude: location.hasAltitude() ? location.getAltitude() : null,
-	    speed: location.hasSpeed() ? location.getSpeed() : null,
-	    bearing: location.hasBearing() ? location.getBearing() : null,
+	    altitude: location.hasAltitude() ? location.getAltitude() : undefined,
+	    speed: location.hasSpeed() ? location.getSpeed() : undefined,
+	    bearing: location.hasBearing() ? location.getBearing() : undefined,
 	    extras: location.getExtras(),
-	  } : null;
+	  } : undefined;
 	}.bind(service);
 
 	service.initialize = function() {
-		console.log('initialize running');
 	  this.googleApiClient = new GoogleApiClient.Builder(application.android.context)
 	    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks({
 	      onConnected: function() {
@@ -88,8 +87,8 @@ const geolocation = () => {
 		this.googleApiClient.connect();
 	}.bind(service);
 
-	service.disconnect = function() {
-		debug('disconnect');
+	service.disconnect = function(message) {
+		debug('disconnect ', message);
 		this.googleApiClient.disconnect();
 		this.ready = false;
 	}.bind(service);
@@ -99,17 +98,30 @@ const geolocation = () => {
 	  	return new Promise(function(resolve, reject) {
 	    	var _getCurrent = function _getCurrent() {
 		    	this.resolve = resolve.bind(this);
-				LocationServices.FusedLocationApi.requestLocationUpdates(this.googleApiClient, this.locationRequest, this.locationListener);
+				LocationServices.FusedLocationApi
+					.requestLocationUpdates(this.googleApiClient, this.locationRequest, this.locationListener);
 	        	this.off('_googleApiClientConnected');
 		    	setTimeout(()=>{
 	    			reject('geoLocation timeout error');
-	    			this.disconnect();
+	    			this.disconnect('_getcurrent');
 	    		},params.locationMaxWaitTime*10);
 	    	}.bind(this);
 	    	if (this.ready) {
 	      		_getCurrent();
 	    	} else {
 	      		this.on('_googleApiClientConnected', _getCurrent);
+	      		this.on('_googleApiClientConnectionSuspended', ()=>{
+			    	setTimeout(()=>{
+		    			this.off('_googleApiClientConnectionSuspended');
+		    			reject('geoLocation ConnectionSuspended');
+		    		},params.locationMaxWaitTime*5);
+	      		});
+	      		this.on('_googleApiClientConnectionFailed', ()=>{
+			    	setTimeout(()=>{
+			    		this.off('_googleApiClientConnectionFailed');
+		    			reject('geoLocation ConnectionFailed');
+		    		},params.locationMaxWaitTime*5);
+	      		});
 	    	}
 	  	}.bind(this));
 	}.bind(service);	
